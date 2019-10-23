@@ -1,0 +1,32 @@
+diff --git a/ports/log4cpp/portfile.cmake b/ports/log4cpp/portfile.cmake
+index 56688c6f7..1ab391f07 100644
+--- a/ports/log4cpp/portfile.cmake
++++ b/ports/log4cpp/portfile.cmake
+@@ -4,14 +4,20 @@ if(VCPKG_CMAKE_SYSTEM_NAME MATCHES "WindowsStore")
+     message(FATAL_ERROR "${PORT} does not currently support UWP.")
+ endif()
+ 
++list(APPEND LOG4CPP_PATCH_LIST fix-install-targets.patch)
++
++if(VCPKG_LIBRARY_LINKAGE STREQUAL static)
++	list(APPEND LOG4CPP_PATCH_LIST log4cpp-static.patch)	
++endif()
++
+ vcpkg_from_github(
+-    OUT_SOURCE_PATH SOURCE_PATH
+-    REPO orocos-toolchain/log4cpp
+-    REF v2.9.1
+-    SHA512 5bd222c820a15c5d96587ac9fe864c3e2dc0fbce8389692be8dd41553ac0308002ad8d6f4ef3ef10af1d796f8ded410788d1a5d22f15505fac639da3f73e3518
+-    HEAD_REF master
+-    PATCHES
+-        fix-install-targets.patch
++	OUT_SOURCE_PATH SOURCE_PATH
++	REPO orocos-toolchain/log4cpp
++	REF v2.9.1
++	SHA512 5bd222c820a15c5d96587ac9fe864c3e2dc0fbce8389692be8dd41553ac0308002ad8d6f4ef3ef10af1d796f8ded410788d1a5d22f15505fac639da3f73e3518
++	HEAD_REF master
++	PATCHES
++		${LOG4CPP_PATCH_LIST}
+ )
+ 
+ vcpkg_configure_cmake(
