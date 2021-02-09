@@ -376,7 +376,8 @@ $arguments = (
 "/p:PlatformToolset=$platformToolset",
 "/p:TargetPlatformVersion=$windowsSDK",
 "/p:PreferredToolArchitecture=$PreferredToolArchitecture",
-"/verbosity:diagnostic",
+"/verbosity:minimal",
+"/m",
 "/nologo",
 "`"$vcpkgSourcesPath\dirs.proj`"") -join " "
 
