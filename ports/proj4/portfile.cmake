@@ -1,44 +1,57 @@
-include(vcpkg_common_functions)
-
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO OSGeo/PROJ
-    REF 6.1.1
-    SHA512 d7c13eec5bc75ace132b7a35118b0e254b9e766cad7bfe23f8d1ec52c32e388607b4f04e9befceef8185e25b98c678c492a6319d19a5e62d074a6d23474b68fa
+    REF 7.2.1
+    SHA512 e6e77266dcd70c939c16667c916cccab8de161221d2ef600cfca43382f50da2dc8d790561556b4416adbb4ac6fba939004e0cc936c278e0e808dc3566e9a70d4
     HEAD_REF master
     PATCHES
         fix-sqlite3-bin.patch
         disable-projdb-with-arm-uwp.patch
         fix-win-output-name.patch
-        fix-sqlite-dependency-export.patch
-        fix-linux-build.patch
+        fix-proj4-targets-cmake.patch
+        tools-cmake.patch
 )
 
 if(VCPKG_LIBRARY_LINKAGE STREQUAL "dynamic")
   set(VCPKG_BUILD_SHARED_LIBS ON)
+  set(EXTRA_FEATURES tiff ENABLE_TIFF tools BUILD_PROJSYNC tools ENABLE_CURL)
+  set(TOOL_NAMES cct cs2cs geod gie proj projinfo projsync)
 else()
   set(VCPKG_BUILD_SHARED_LIBS OFF)
+  set(TOOL_NAMES cct cs2cs geod gie proj projinfo)
 endif()
 
 vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
-    database BUILD_PROJ_DATABASE
+  database BUILD_PROJ_DATABASE
+  tools BUILD_CCT
+  tools BUILD_CS2CS
+  tools BUILD_GEOD
+  tools BUILD_GIE
+  tools BUILD_PROJ
+  tools BUILD_PROJINFO
+  ${EXTRA_FEATURES}
 )
+
+if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
+  message(WARNING "ENABLE_TIFF ENABLE_CURL and BUILD_PROJSYNC will be off when building static")
+  set(FEATURE_OPTIONS ${FEATURE_OPTIONS} -DENABLE_TIFF=OFF -DENABLE_CURL=OFF -DBUILD_PROJSYNC=OFF)
+endif()
 
 if ("database" IN_LIST FEATURES)
     if (VCPKG_TARGET_IS_WINDOWS)
         set(BIN_SUFFIX .exe)
-        if (VCPKG_TARGET_ARCHITECTURE STREQUAL arm)
-            if (NOT EXISTS ${CURRENT_INSTALLED_DIR}/../x86-windows/tools/sqlite3-bin.exe)
-                message(FATAL_ERROR "Proj4 database need to install sqlite3[tool]:x86-windows first.")
-            endif()
+        if (EXISTS ${CURRENT_INSTALLED_DIR}/../x86-windows/tools/sqlite3.exe)
             set(SQLITE3_BIN_PATH ${CURRENT_INSTALLED_DIR}/../x86-windows/tools)
-        elseif (VCPKG_TARGET_ARCHITECTURE STREQUAL arm64 OR (VCPKG_TARGET_ARCHITECTURE STREQUAL x64 AND VCPKG_LIBRARY_LINKAGE STREQUAL dynamic))
-            if (NOT EXISTS ${CURRENT_INSTALLED_DIR}/../x64-windows/tools/sqlite3-bin.exe)
-                message(FATAL_ERROR "Proj4 database need to install sqlite3[tool]:x64-windows first.")
-            endif()
+        elseif (EXISTS ${CURRENT_INSTALLED_DIR}/../x86-windows-static/tools/sqlite3.exe)
+            set(SQLITE3_BIN_PATH ${CURRENT_INSTALLED_DIR}/../x86-windows-static/tools)
+        elseif (EXISTS ${CURRENT_INSTALLED_DIR}/../x64-windows/tools/sqlite3.exe AND (NOT CMAKE_HOST_SYSTEM_PROCESSOR OR CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86_64"))
             set(SQLITE3_BIN_PATH ${CURRENT_INSTALLED_DIR}/../x64-windows/tools)
-        else()
+        elseif (EXISTS ${CURRENT_INSTALLED_DIR}/../x64-windows-static/tools/sqlite3.exe AND (NOT CMAKE_HOST_SYSTEM_PROCESSOR OR CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86_64"))
+            set(SQLITE3_BIN_PATH ${CURRENT_INSTALLED_DIR}/../x64-windows-static/tools)
+        elseif (NOT TRIPLET_SYSTEM_ARCH STREQUAL "arm" AND EXISTS ${CURRENT_INSTALLED_DIR}/tools/sqlite3.exe)
             set(SQLITE3_BIN_PATH ${CURRENT_INSTALLED_DIR}/tools)
+        else()
+            message(FATAL_ERROR "Proj4 database need to install sqlite3[tool]:x86-windows first.")
         endif()
     else()
         set(BIN_SUFFIX)
@@ -50,24 +63,20 @@ vcpkg_configure_cmake(
     SOURCE_PATH ${SOURCE_PATH}
     PREFER_NINJA
     OPTIONS ${FEATURE_OPTIONS}
-    -DBUILD_LIBPROJ_SHARED=${VCPKG_BUILD_SHARED_LIBS}
     -DPROJ_LIB_SUBDIR=lib
     -DPROJ_INCLUDE_SUBDIR=include
-    -DPROJ_DATA_SUBDIR=share/proj4
-    -DBUILD_CCT=OFF
-    -DBUILD_CS2CS=OFF
-    -DBUILD_GEOD=OFF
-    -DBUILD_GIE=OFF
-    -DBUILD_PROJ=OFF
-    -DBUILD_PROJINFO=OFF
-    -DPROJ_TESTS=OFF
-    -DEXE_SQLITE3=${SQLITE3_BIN_PATH}/sqlite3-bin${BIN_SUFFIX}
+    -DPROJ_DATA_SUBDIR=share/${PORT}
+    -DBUILD_TESTING=OFF
+    -DEXE_SQLITE3=${SQLITE3_BIN_PATH}/sqlite3${BIN_SUFFIX}
 )
 
 vcpkg_install_cmake()
-vcpkg_fixup_cmake_targets(CONFIG_PATH lib/cmake/proj4)
+vcpkg_fixup_cmake_targets(CONFIG_PATH lib/cmake/${PORT})
+if ("tools" IN_LIST FEATURES)
+    vcpkg_copy_tools(TOOL_NAMES ${TOOL_NAMES} AUTO_CLEAN)
+endif ()
 
 file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/include)
 file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/share)
 
-file(INSTALL ${SOURCE_PATH}/COPYING DESTINATION ${CURRENT_PACKAGES_DIR}/share/proj4 RENAME copyright)
+file(INSTALL ${SOURCE_PATH}/COPYING DESTINATION ${CURRENT_PACKAGES_DIR}/share/${PORT} RENAME copyright)

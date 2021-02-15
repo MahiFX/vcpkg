@@ -1,21 +1,19 @@
-include(vcpkg_common_functions)
-
 vcpkg_check_linkage(ONLY_STATIC_LIBRARY)
 
 if("public-preview" IN_LIST FEATURES)
     vcpkg_from_github(
         OUT_SOURCE_PATH SOURCE_PATH
         REPO Azure/azure-uhttp-c
-        REF 56241b845ff771a64b864268770e110a4c30578d
-        SHA512 fd7761f80297177ac0a08efad87f09b9403f84b6ce74bf925f4efc7ca79dbad1330d2abe870434c548c46d3a09ba9beea023345e70043e58dc64d67f1972f8e0
+        REF d84a20609a2b5a555920389451fb3c9a2ed3656c
+        SHA512 4eadd7e120082cc3bcf696d6cd16bc7ee8e1082380dd7583fba7fad1bb95109f3456890495e25ae7675e656ef721fa12eff22eeb96d8a4cf359be5c96889cbd6
         HEAD_REF master
     )
 else()
     vcpkg_from_github(
         OUT_SOURCE_PATH SOURCE_PATH
         REPO Azure/azure-uhttp-c
-        REF 56241b845ff771a64b864268770e110a4c30578d
-        SHA512 fd7761f80297177ac0a08efad87f09b9403f84b6ce74bf925f4efc7ca79dbad1330d2abe870434c548c46d3a09ba9beea023345e70043e58dc64d67f1972f8e0
+        REF c22177c4cae57992e45e2b0db3f624c31b0f4666
+        SHA512 70c011486aaf3e5af81e781d5183dcb3b6da234f9b41af9138e726bea1fd19326979a95d59bcb4314781d7ee4ef0c7fdfa9b30928a0688024d3fd93cb4168217
         HEAD_REF master
     )
 endif()
@@ -38,7 +36,7 @@ vcpkg_fixup_cmake_targets(CONFIG_PATH cmake TARGET_PATH share/uhttp)
 
 file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/include ${CURRENT_PACKAGES_DIR}/debug/share)
 
-configure_file(${SOURCE_PATH}/LICENSE ${CURRENT_PACKAGES_DIR}/share/azure-uhttp-c/copyright COPYONLY)
+configure_file(${SOURCE_PATH}/LICENSE ${CURRENT_PACKAGES_DIR}/share/${PORT}/copyright COPYONLY)
 
 vcpkg_copy_pdbs()
 
