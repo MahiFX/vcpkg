@@ -4,8 +4,8 @@ vcpkg_check_linkage(ONLY_STATIC_LIBRARY)
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO GoogleCloudPlatform/functions-framework-cpp
-    REF v0.3.0
-    SHA512 28594c275b7ac85ccbdcd9a1ab8e3a7c26932006f0da6ede4aab29f303305536b111cbcf99e9f8558f71f56876bc3e3b790f0627bd708ec9b09999f27ef37f3b
+    REF v1.1.0
+    SHA512 2dcedbded84fdd604724b4f2482ee531aaa640ebdbb69f77978e1af8943d9d7746152953953ebd89d8304ed3efbc334c620890142b0ba2e1239862e43a158364
     HEAD_REF main
 )
 
@@ -29,3 +29,5 @@ file(
     RENAME copyright)
 
 vcpkg_copy_pdbs()
+
+vcpkg_fixup_pkgconfig()
