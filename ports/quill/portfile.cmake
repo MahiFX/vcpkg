@@ -3,15 +3,20 @@ vcpkg_check_linkage(ONLY_STATIC_LIBRARY)
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO odygrd/quill
-    REF v2.1.0
-    SHA512 377e765d455cff729e8b5df6a1fcb28335c20259d8ff1b4ef3327f8640a7c69467147e39a9eab1c92097e04db3f732b9906e55167d5c9fd334e054b5eb5d320c
+    REF v${VERSION}
+    SHA512 9b15c33041b1eaf57106c7cf8924017462598f91c27112178518591f66481bc496f0729ce819112c27c4bdc61db9816f88fd955d0392b313736a0d54cea4f716
     HEAD_REF master
 )
+
+if(VCPKG_TARGET_IS_ANDROID)
+    set(ADDITIONAL_OPTIONS -DQUILL_NO_THREAD_NAME_SUPPORT=ON)
+endif()
 
 vcpkg_cmake_configure(
     SOURCE_PATH ${SOURCE_PATH}
     OPTIONS
         -DQUILL_FMT_EXTERNAL=ON
+        ${ADDITIONAL_OPTIONS}
 )
 
 vcpkg_cmake_install()
@@ -28,6 +33,9 @@ endif()
 vcpkg_fixup_pkgconfig()
 
 vcpkg_replace_string("${CURRENT_PACKAGES_DIR}/include/quill/TweakMe.h" "// #define QUILL_FMT_EXTERNAL" "#define QUILL_FMT_EXTERNAL")
+if(VCPKG_TARGET_IS_ANDROID)
+    vcpkg_replace_string("${CURRENT_PACKAGES_DIR}/include/quill/TweakMe.h" "// #define QUILL_NO_THREAD_NAME_SUPPORT" "#define QUILL_NO_THREAD_NAME_SUPPORT")
+endif()
 file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
 
-file(INSTALL "${SOURCE_PATH}/LICENSE" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}" RENAME copyright)
+vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE")

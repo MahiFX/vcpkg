@@ -9,8 +9,8 @@ vcpkg_from_gitlab(
     GITLAB_URL https://gitlab.freedesktop.org/xorg
     OUT_SOURCE_PATH SOURCE_PATH
     REPO font/util
-    REF  d45011b8324fecebb4fc79e57491d341dd96e325 #1.3.2
-    SHA512 d783cbb5b8b0975891a247f98b78c2afadfd33e1d26ee8bcf7ab7ccc11615b0150d07345c719182b0929afc3c54dc3288a01a789b5374e18aff883ac23d15b04
+    REF "font-util-${VERSION}"
+    SHA512 93285c2e8c5c01f069a7621dba0bbb1175c0ebbea27d521395b40f036443c162fc1948c4d3cb34fe6c509d1818d95ed7e6d38919e3f7857dfa53e388aadb9128
     HEAD_REF master
     PATCHES build.patch
 ) 
@@ -45,12 +45,13 @@ string(REPLACE "datarootdir=\${prefix}/share/${PORT}" "datarootdir=\${prefix}/sh
 string(REPLACE "exec_prefix=\${prefix}" "exec_prefix=\${prefix}/tools/${PORT}" _contents "${_contents}")
 file(WRITE "${_file}" "${_contents}")
 
-set(_file "${CURRENT_PACKAGES_DIR}/debug/lib/pkgconfig/fontutil.pc")
-file(READ "${_file}" _contents)
-string(REPLACE "datarootdir=\${prefix}/share/${PORT}" "datarootdir=\${prefix}/../share/xorg" _contents "${_contents}")
-string(REPLACE "exec_prefix=\${prefix}" "exec_prefix=\${prefix}/../tools/${PORT}" _contents "${_contents}")
-file(WRITE "${_file}" "${_contents}")
-
+if(NOT VCPKG_BUILD_TYPE)
+    set(_file "${CURRENT_PACKAGES_DIR}/debug/lib/pkgconfig/fontutil.pc")
+    file(READ "${_file}" _contents)
+    string(REPLACE "datarootdir=\${prefix}/share/${PORT}" "datarootdir=\${prefix}/../share/xorg" _contents "${_contents}")
+    string(REPLACE "exec_prefix=\${prefix}" "exec_prefix=\${prefix}/../tools/${PORT}" _contents "${_contents}")
+    file(WRITE "${_file}" "${_contents}")
+endif()
 # Handle copyright
 file(INSTALL "${SOURCE_PATH}/COPYING" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}" RENAME "copyright")
 endif()

@@ -11,11 +11,10 @@ endif()
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO texus/TGUI
-    REF 6515153c2466e6677ba933679b3dca6c283daf87
-    SHA512 109e64c114336979a4bd0d44765e4bc26cb4ecb6e4db92d7441230d148438b084d01cb56dd292f09a6fd28b0f7420044455ffb519147cc3aea71e322142cd9a0
-    HEAD_REF 0.9
+    REF "v${VERSION}"
+    SHA512 0896551286a40ea5b6e778018473bd230c7c3052cf19cbecfdc00789f029e9a753e569fdd5aab6f2e1e74c5fb8873bf1f7389e66abeaa3d628d6032941af331e
+    HEAD_REF 1.x
     PATCHES
-        fix-dependencies.patch
         devendor-stb.patch
 )
 
@@ -50,6 +49,8 @@ vcpkg_cmake_configure(
         -DTGUI_BUILD_GUI_BUILDER=OFF
     MAYBE_UNUSED_VARIABLES
         TGUI_BUILD_FRAMEWORK
+        TGUI_HAS_BACKEND_SDL
+        TGUI_HAS_BACKEND_SFML
 )
 
 vcpkg_cmake_install()

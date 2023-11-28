@@ -2,8 +2,8 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO beached/daw_json_link
-    REF 6275cd9dadfed96e1b21e552657680ea9fce24cb  #v3.0.4
-    SHA512 7ba326480047b1cfc3cf40114d2793e368d5bc8e90a4e690f17fbac1066e6a89b2c031bef19abab9199b83314dff327651b67f73654e306b17b070b85c50a0f6
+    REF "v${VERSION}"
+    SHA512 0d201ef02a345df6a59be2240594566474b0a9d0634cb0fb5b7ba4798efe5056cb1b34798288d18f52849a8671cc98bf6856b8bc32cf7e7d3837d04feecebea9
     HEAD_REF master
 )
 
@@ -37,4 +37,4 @@ file(APPEND "${SOURCE_PATH}/copyright" [=[
 
 file(READ "${SOURCE_PATH}/LICENSE_Dragonbox" dragonbox_copywrite)
 file(APPEND "${SOURCE_PATH}/copyright" ${dragonbox_copywrite})
-file(INSTALL "${SOURCE_PATH}/copyright" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
+vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/copyright")
