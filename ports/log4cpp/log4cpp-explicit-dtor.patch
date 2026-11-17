@@ -1,0 +1,22 @@
+diff --git a/include/log4cpp/LoggingEvent.hh b/include/log4cpp/LoggingEvent.hh
+index 8da227b..021c72d 100644
+--- a/include/log4cpp/LoggingEvent.hh
++++ b/include/log4cpp/LoggingEvent.hh
+@@ -52,6 +52,7 @@ namespace log4cpp {
+ 					 Priority::Value priority,
+ 					 const std::string& threadName,
+ 					 TimeStamp& timeStamp);
++        ~LoggingEvent();
+ 
+ 
+         /** The category name. */
+diff --git a/src/LoggingEvent.cpp b/src/LoggingEvent.cpp
+index c24bdce..520e04b 100644
+--- a/src/LoggingEvent.cpp
++++ b/src/LoggingEvent.cpp
+@@ -39,4 +39,5 @@ namespace log4cpp {
+ 			timeStamp(timeStamp)
+ 	{
+ 	}
++    LoggingEvent::~LoggingEvent() {}
+ }
